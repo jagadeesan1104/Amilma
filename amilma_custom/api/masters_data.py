@@ -77,7 +77,7 @@ def get_freezer_data():
 @frappe.whitelist()
 def get_freezer_data_documents(db):
 	try:
-		documents = frappe.db.get_all('Freezer Data',{'customer_group': db},['name'] )
+		documents = frappe.db.get_all('Freezer Data',{'customer_group': db},['name','make','model','capacity','basket','serial_no','freezer_deposit_status','freezer_deposit','transaction_reference_number','freezer_placed_date','distributor'] )
 		return {"status": True, "db": documents}
 	except:
 		return {"status": False}
