@@ -14,7 +14,6 @@ def get_masters_data():
 		get_existing_type_data = get_existing_brand_volume()
 		get_distributor_data = get_distributor()
 		get_freezer = get_freezer_data()
-		get_freezer_data_group = get_freezer_data_documents()
 
 		masters_data_list = {
 			"route_list":get_route_data,
@@ -25,9 +24,7 @@ def get_masters_data():
 			"outlet_type_list":get_outlet_type_data,
 			"existing_type_list":get_existing_type_data,
 			"db":get_distributor_data,
-			"freezer_data":get_freezer,
-			"customer_group":get_freezer_data_group
-		}
+			"freezer_data":get_freezer,		}
 		return {"status":True,"Masters Data":masters_data_list}
 	except:
 		return{"status":False}
@@ -81,10 +78,8 @@ def get_freezer_data():
 def get_freezer_data_documents(db):
 	try:
 		documents = frappe.db.get_all('Freezer Data',{'customer_group': db},['name'] )
-		
 		return {"status": True, "db": documents}
 	except:
-		
 		return {"status": False}
 
 
