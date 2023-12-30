@@ -1,5 +1,6 @@
 import frappe
 from frappe.utils import now,getdate,today,nowdate
+from datetime import datetime
 
 
 #the below code is for APK Dashboard activites page list the number of datas
@@ -93,20 +94,33 @@ def dashboard_activites(user_id):
     return{'status':status,'message':'Succesfully','Dashboard':dashboard}
 
 @frappe.whitelist()
-def target_data(user_id):
+def target_setting(user_id):
     today = nowdate()
-    get_primary_monthly_target = ""
-    month_start_date = frappe.utils.data.get_first_day(today)
-    month_end_date = frappe.utils.data.get_last_day(today)
-    get_freezer_target_data = frappe.db.get_all('Amilma Target Setting', fields=['sales_officer'])
-    # get_freezer_target_data = frappe.db.get_all("Amilma Target Setting",{'target_from':month_start_date,'target_to':month_end_date,"type":"Primary"},['*'])
-    for target_data in get_freezer_target_data:
-        if target_data.sales_officer == user_id:
-            get_primary_monthly_target = frappe.db.sql(""" select sum(target_amount) as target_amount from `tabAmilma Target Setting` where target_from = '%s' and target_to = '%s' and sales_officer = '%s' and type = "Primary" """%(month_start_date,month_end_date,user_id),as_dict=1)
-        elif target_data.area_sales_manager == user_id:
-            get_primary_monthly_target = frappe.db.sql(""" select sum(target_amount) as target_amount from `tabAmilma Target Setting` where target_from = '%s' and target_to = '%s' and area_sales_manager = '%s' and type = "Primary" """%(month_start_date,month_end_date,user_id),as_dict=1)
-        elif target_data.regional_sales_manager == user_id:
-            get_primary_monthly_target = frappe.db.sql(""" select sum(target_amount) as target_amount from `tabAmilma Target Setting` where target_from = '%s' and target_to = '%s' and regional_sales_manager = '%s' and type = "Primary" """%(month_start_date,month_end_date,user_id),as_dict=1)
-    return {"status":True,"primary_target":get_freezer_target_data}    
+    status = ""
+    try:
+        get_primary_monthly_target = ""
+        start_date = datetime.strptime(today, '%Y-%m-%d').month
+        check_user_id = frappe.db.exists("User",{'name':user_id})
+        if check_user_id:
+            emp_in_user_id = frappe.db.exists("Employee",{'status':'Active','user_id':user_id})
+            if emp_in_user_id:
+                get_emp = frappe.db.get_value('Employee',{'name':emp_in_user_id},['designation'])
+                if get_emp == "Sales Officer":
+                    get_primary_monthly_target = frappe.db.sql(""" select sum(target_amount) as target_amount from `tabAmilma Target Setting` where month = '%s' and so_designation = "Sales Officer"  and type = "Primary" """%(start_date),as_dict=1)
+                elif get_emp == "Area Sales Manager":
+                    get_primary_monthly_target = frappe.db.sql(""" select sum(target_amount) as target_amount from `tabAmilma Target Setting` where month = '%s' and so_designation = "Area Sales Manager"  and type = "Primary" """%(start_date),as_dict=1)
+                elif get_emp == "Regional Sales Manager":
+                    get_primary_monthly_target = frappe.db.sql(""" select sum(target_amount) as target_amount from `tabAmilma Target Setting` where month = '%s' and so_designation = "Regional Sales Manager"  and type = "Primary" """%(start_date),as_dict=1)
+                else:
+                    status = False
+            else:
+                status = False
+        else:
+            status = False
+        return {"status":status,"primary_target":get_primary_monthly_target,}     
+    except:
+        status = False
+        return {"status":status}           
+  
 
     
