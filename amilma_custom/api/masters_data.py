@@ -74,6 +74,7 @@ def get_freezer_data():
 	freezer_data = frappe.db.get_all('Freezer Data',['make','model','capacity','basket','serial_no','freezer_deposit_status','freezer_deposit','transaction_reference_number','freezer_placed_date','distributor'])
 	return freezer_data
 
+#get the freezer data document id by filtering the 
 @frappe.whitelist()
 def get_freezer_data_documents(db):
 	try:
@@ -82,4 +83,14 @@ def get_freezer_data_documents(db):
 	except:
 		return {"status": False}
 
-
+#outlet data against selecting the db in sales and purchase 
+@frappe.whitelist()
+def outlet_data_against_sales_and_purchase(db):
+	status = ""
+	try:
+		outlet_data = frappe.db.get_value("Company",{'name':db},['customer'])
+		status = True
+		return{"status":status,"outlet_id":outlet_data}
+	except:
+		status = False
+		return {"status":status}
