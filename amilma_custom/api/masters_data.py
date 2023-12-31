@@ -88,7 +88,7 @@ def get_freezer_data_documents(db):
 def outlet_data_against_sales_and_purchase(db):
 	status = ""
 	try:
-		outlet_data = frappe.db.get_all("Customer",{'customer_type':"Company",'customer_group':'Distributors','customer_name':db},['name'])
+		outlet_data = frappe.db.get_value("Company",{'name':db},['customer'])
 		status = True
 		return{"status":status,"outlet_id":outlet_data}
 	except:
