@@ -21,14 +21,18 @@
   "target_to",
   "column_break_7",
   "target_amount",
+  "month",
   "amended_from",
   "naming_series",
   "user_details_tab",
   "sales_officer",
+  "so_designation",
   "column_break_ph86i",
   "area_sales_manager",
+  "asm_designation",
   "column_break_4yzoa",
-  "regional_sales_manager"
+  "regional_sales_manager",
+  "rsm_designation"
  ],
  "fields": [
   {
@@ -161,12 +165,41 @@
    "fieldtype": "Link",
    "label": "Regional Sales Manager",
    "options": "User"
+  },
+  {
+   "default": "Sales Officer",
+   "depends_on": "eval:doc.sales_officer",
+   "fieldname": "so_designation",
+   "fieldtype": "Data",
+   "label": "SO Designation",
+   "read_only": 1
+  },
+  {
+   "default": "Area Sales Manager",
+   "depends_on": "eval:doc.area_sales_manager",
+   "fieldname": "asm_designation",
+   "fieldtype": "Data",
+   "label": "ASM Designation",
+   "read_only": 1
+  },
+  {
+   "default": "Regional Sales Manager",
+   "depends_on": "eval:doc.regional_sales_manager",
+   "fieldname": "rsm_designation",
+   "fieldtype": "Data",
+   "label": "RSM Designation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Int",
+   "label": "Month"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-12-28 15:21:53.584484",
+ "modified": "2023-12-31 09:00:09.534772",
  "modified_by": "Administrator",
  "module": "Amilma Custom",
  "name": "Amilma Target Setting",
