@@ -20,7 +20,7 @@ def create_expense_claim(user_id, attach, employee, date, expenses):
 				new_expense_claim = frappe.new_doc('Expense Claim')
 				new_expense_claim.employee = employee
 				new_expense_claim.posting_date = posting_date_format
-				# new_expense_claim.payable_account = "Creditors - SAFGPL"
+				new_expense_claim.payable_account = "Creditors - SAFGPL"
 				new_expense_claim.company = get_expense_approver[1]
 				# new_expense_claim.expense_approver = get_expense_approver
 				for item_data in expenses:
