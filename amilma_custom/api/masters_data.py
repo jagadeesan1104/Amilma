@@ -6,7 +6,6 @@ def get_masters_data():
 	try:
 		#get all the master data methods
 		get_route_data = get_route()
-		get_customer_data = get_customer()
 		get_company_data = get_company()
 		get_mode_of_payment_data = get_mode_of_payment()
 		get_outlet_category_data = get_outlet_category()
@@ -17,14 +16,14 @@ def get_masters_data():
 
 		masters_data_list = {
 			"route_list":get_route_data,
-			"outlet_list":get_customer_data,
 			"company_list":get_company_data,
 			"mode_of_payment_list":get_mode_of_payment_data,
 			"outlet_category_list":get_outlet_category_data,
 			"outlet_type_list":get_outlet_type_data,
 			"existing_type_list":get_existing_type_data,
 			"db":get_distributor_data,
-			"freezer_data":get_freezer,		}
+			"freezer_data":get_freezer,		
+		}
 		return {"status":True,"Masters Data":masters_data_list}
 	except:
 		return{"status":False}
@@ -33,11 +32,6 @@ def get_masters_data():
 def get_route():
 	get_route = frappe.db.get_all('Territory',['name'])
 	return get_route
-
-#customer master data  
-def get_customer():
-	get_customer = frappe.db.get_all('Customer',['name'])
-	return get_customer
 
 #company master data  
 def get_company():
