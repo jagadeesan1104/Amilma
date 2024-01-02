@@ -87,14 +87,22 @@ def get_freezer_data_documents(db):
 @frappe.whitelist()
 def outlet_data_against_sales_and_purchase(db):
 	status = ""
+	formatted_lead_list = []
 	try:
 		customer_group = frappe.db.get_value("Company",{'name':db},['customer_group'])
 		if customer_group:
-			outlet_data = frappe.db.get_all("Customer",{'customer_group':customer_group},['name'])
+			outlet_data = frappe.db.get_all("Customer",{'customer_group':customer_group,'disabled':0},['name','customer_name'])
+			for outlet in outlet_data:
+				outlet = {
+					"id":outlet.name,
+					"name":outlet.name,
+					"customer_name":outlet.customer_name
+				}
+				formatted_lead_list.append(outlet)
 		else:
 			outlet_data = ""	
 		status = True
-		return{"status":status,"outlet_id":outlet_data}
+		return{"status":status,"outlet":formatted_lead_list}
 	except:
 		status = False
 		return {"status":status}
