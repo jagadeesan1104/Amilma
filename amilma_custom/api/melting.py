@@ -45,11 +45,10 @@ def melting_claim_list(user_id):
             melting_claim_data = {
                 'id':melting_claim.name,
                 'name':melting_claim.name,
-                'select_db': melting_claim.db,
-                'select_outlet': melting_claim.outlet,
-                'select_date': melting_claim.posting_date,
-                'total_amount' :melting_claim.net_total,
-                'melting_claim_items': []
+                'db_name': melting_claim.db,
+                'outlet_name': melting_claim.outlet,
+                'total_amount' :melting_claim.net_total,    
+                'item_details': []
             }
 
             # Fetch items for each Purchase Order
