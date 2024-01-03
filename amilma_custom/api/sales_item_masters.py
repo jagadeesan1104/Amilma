@@ -33,3 +33,32 @@ def get_item_price_list(item_code):
 def get_item_warehouse(company):
     warehouse = frappe.db.get_value('Warehouse', {'company': company, 'warehouse_name': 'Stores'}, ['name'])
     return warehouse
+
+#get the discount and taxes against sales order
+@frappe.whitelist()
+def get_sales_order_discount(company,customer):
+    status = ""
+    try:
+        get_discount = frappe.db.get_value('Price Rule',{'selling':1,'company':company,'customer':customer},['discount_percentage','apply_discount_on']) or ""
+        get_taxes = get_tax(company)
+        status = True
+        discount_percentage = {
+            "disc_perce":get_discount[0],
+            "disc_applied_on":get_discount[1],
+            "get_taxes":get_taxes
+        }
+        return {"status":status,"get_discount_details":discount_percentage}     
+    except:
+        status = False
+        return {"status":status}
+
+#get the taxes by passing the company    
+def get_tax(company):
+    get_taxes = ""
+    get_sales_tax = frappe.db.get_value("Company",{'name':company},['custom_sales_tax_category'])
+    if get_sales_tax:
+        get_taxes = frappe.db.get_all("Sales Taxes and Charges",{'parent':get_sales_tax},['account_head','rate'])
+        return get_taxes 
+    else:
+        return get_taxes
+   
