@@ -230,4 +230,11 @@ def get_monthly_achieved_as_secondary(user_id):
 #         return get_secondary_monthly_achieved
 
 
-# def new_calls_overall_data(user_id):
+def new_calls_overall_data(user_id):
+    try:
+        current_date = today()
+        start_date = frappe.utils.data.get_first_day(today)
+        end_date = frappe.utils.data.get_last_day(today)
+        new_call = frappe.db.sql(""" select count(name) as total_leads from `tabLead` where creation >= """)
+    except:
+        pass
