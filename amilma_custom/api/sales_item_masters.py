@@ -39,7 +39,7 @@ def get_item_warehouse(company):
 def get_sales_order_discount(company,customer):
     status = ""
     try:
-        get_discount = frappe.db.get_value('Price Rule',{'selling':1,'company':company,'customer':customer},['discount_percentage','apply_discount_on']) or ""
+        get_discount = frappe.db.get_value('Pricing Rule',{'selling':1,'company':company,'customer':customer},['discount_percentage','apply_discount_on']) or ""
         get_taxes = get_tax(company)
         status = True
         discount_percentage = {
