@@ -57,7 +57,7 @@ def get_tax(company):
     get_taxes = ""
     get_sales_tax = frappe.db.get_value("Company",{'name':company},['custom_sales_tax_category'])
     if get_sales_tax:
-        get_taxes = frappe.db.get_all("Sales Taxes and Charges",{'parent':get_sales_tax},['account_head','rate'])
+        get_taxes = frappe.db.get_all("Sales Taxes and Charges",{'parent':get_sales_tax},['account_head','rate']) or ""
         return get_taxes 
     else:
         return get_taxes
