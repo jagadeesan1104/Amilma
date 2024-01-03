@@ -1,10 +1,12 @@
 import frappe
 from frappe.utils import now,getdate,today,format_date
 from datetime import datetime
+import json
 
 # Create Claim
 @frappe.whitelist()
 def create_claim(user_id,db, outlet,melting_claim_items):
+    convert_json = json.loads(melting_claim_items)
     status = ""
     try:
         get_user = frappe.db.exists('User',{'name':user_id,'enabled':1})
@@ -12,7 +14,7 @@ def create_claim(user_id,db, outlet,melting_claim_items):
             new_claim = frappe.new_doc('Melting Claim')
             new_claim.db = db
             new_claim.outlet = outlet
-            for item in melting_claim_items:
+            for item in convert_json:
                 new_claim.append("melting_claim_items",{
                     "item":item.get("item"),
                     'cate': item.get('cate'),
@@ -27,10 +29,9 @@ def create_claim(user_id,db, outlet,melting_claim_items):
             status = False
             message = "User has no ID or User ID Disabled"
         return {'status': status,'message': message}    
-    except: 
+    except Exception as e:
         status = False
-        return {"status": status}
-
+        return {"status": status, "message": e}
 
 # melting claim list view
 @frappe.whitelist()
