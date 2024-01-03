@@ -1,11 +1,13 @@
 import frappe
 from frappe.utils import now,getdate,today,format_date
 from datetime import datetime
+import json
 
 
 #create a new purchase order
 @frappe.whitelist()
 def create_purchase_order(user_id,db,outlet,date,items):
+    convert_json = json.loads(items)
     status = ""
     posting_date_format = datetime.strptime(format_date(date), "%d-%m-%Y").date()
     try:
@@ -17,7 +19,7 @@ def create_purchase_order(user_id,db,outlet,date,items):
             new_purchase_order.transaction_date = posting_date_format
             new_purchase_order.schedule_date = posting_date_format
             new_purchase_order.custom_api_method_marked = 1
-            for item_data in items:
+            for item_data in convert_json:
                 new_purchase_order.append("items",{
                     "item_code":item_data.get("item_code"),
                     "qty":item_data.get("qty"),
@@ -31,9 +33,9 @@ def create_purchase_order(user_id,db,outlet,date,items):
             status = False
             message = "User has no ID or User ID Disabled"
         return {"status":status,"message":message}    
-    except:
+    except Exception as e:
         status = False
-        return {"status":status}
+        return {"status": status, "message": e}
 
 # Purchase order list view 
 @frappe.whitelist()
