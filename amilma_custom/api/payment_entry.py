@@ -8,7 +8,7 @@ def create_payment_entry(user_id,db,outlet,posting_date,mode_of_payment,paid_amo
     status = ""
     message = ""
     status = ""
-    posting_date_format = datetime.strptime(format_date(posting_date), "%d-%m-%Y").date()
+    posting_date_format = datetime.strptime(format_date(posting_date), "%m-%d-%Y").date()
     # refrence_date = datetime.strptime(format_date(date), "%d-%m-%Y").date()
     try:
         payment_entry_references = frappe.parse_json(references)
