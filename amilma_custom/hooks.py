@@ -191,11 +191,8 @@ fixtures = [{
     "dt": "Custom Field",
     "filters": [
         ["name", "in", [
-            #Employee Checkin Custom Field
-            'Employee Checkin-custom_image','Employee Checkin-custom_punch_date','Employee Checkin-custom_work_done','Employee Checkin-custom_employee_route'
-
             #opportunity Custom Field
-            ,'Opportunity-custom_existing_brand_and_volume','Opportunity-custom_outlet_type','Opportunity-custom_outlet_category'
+            'Opportunity-custom_existing_brand_and_volume','Opportunity-custom_outlet_type','Opportunity-custom_outlet_category'
 
             #Customer Custom Field
             'Customer-custom_outlet_type','Customer-custom_outlet_category','Customer-outlet_type_abbr','Customer-customer_status','Customer-custom_db',

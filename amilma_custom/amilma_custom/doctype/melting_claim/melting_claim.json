@@ -93,7 +93,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-12-24 13:30:41.273478",
+ "modified": "2024-01-04 21:31:16.205552",
  "modified_by": "Administrator",
  "module": "Amilma Custom",
  "name": "Melting Claim",
@@ -110,6 +110,7 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],
