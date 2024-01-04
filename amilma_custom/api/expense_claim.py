@@ -7,7 +7,7 @@ import base64
 def create_expense_claim(user_id, attach, employee, date, expenses):
 	status = ""
 	message = ""
-	posting_date_format = datetime.strptime(format_date(date), "%d-%m-%Y").date()
+	posting_date_format = datetime.strptime(format_date(date), "%m-%d-%Y").date()
 	try:
 		user_exists = frappe.db.exists("User",{'name':user_id})
 		if user_exists:
