@@ -49,7 +49,7 @@ def melting_claim_list(user_id):
                 'db_name': melting_claim.db,
                 'outlet_name': melting_claim.outlet,
                 'total_amount' :melting_claim.net_total,    
-                'item_details': []
+                'melting_claim_items': []
             }
 
             # Fetch items for each Purchase Order
@@ -67,7 +67,7 @@ def melting_claim_list(user_id):
 
             formatted_melting_list.append(melting_claim_data)
 
-        return {"status": True, "melting_claim": formatted_melting_list}
+        return {"status": True, "Item Details": formatted_melting_list}
     except:
         return {"status": False}
 
