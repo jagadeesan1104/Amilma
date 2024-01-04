@@ -1,7 +1,6 @@
 import frappe
 import base64
 from frappe.utils.file_manager import save_file
-
 from frappe.utils import nowdate
 from frappe import _
 from hrms.hr.utils import get_holiday_dates_for_employee
@@ -59,15 +58,15 @@ def get_employee_details(user_id):
                 "image": image_url
             }
         ],
-        # "performance": [
-        #     {
-        #         "rank": employee_name,
-        #         "rating": emp_id,
-        #         "placement": emp_designation,
-        #         "t vs a": "Rasipuram",
-        #         "freezer avg": image_url
-        #     }
-        # ],
+        "performance": [
+            {
+                "rank": employee_name,
+                "rating": emp_id,
+                "placement": emp_designation,
+                "t vs a": "Rasipuram",
+                "freezer avg": image_url
+            }
+        ],
         "attendance_count": [
             {
                 "present_days": present_days ,
