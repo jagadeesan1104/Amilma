@@ -9,7 +9,7 @@ from datetime import datetime
 def create_sales_order(user_id,db,outlet,date,items):
     convert_json = json.loads(items)
     status = ""
-    posting_date_format = datetime.strptime(format_date(date), "%d-%m-%Y").date()
+    posting_date_format = datetime.strptime(format_date(date), "%m-%d-%Y").date()
     try:
         get_user = frappe.db.exists('User',{'name':user_id,'enabled':1})
         if get_user:
