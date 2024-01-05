@@ -73,7 +73,7 @@ def melting_claim_list(user_id):
     except:
         return {"status": False}
 
-
+# melting claim item masters data
 @frappe.whitelist()
 def melting_items_masters(company):
     try:
@@ -93,7 +93,7 @@ def melting_items_masters(company):
                     "avail_qty": stock_balance
                 }
                 formatted_item_list.append(masters_data)
-        return {"status": True, "melting_item_masters": formatted_item_list}
+        return {"status": True, "sales_item_masters": formatted_item_list}
     except Exception as e:
         return {"status": False, "message": str(e)}
 
