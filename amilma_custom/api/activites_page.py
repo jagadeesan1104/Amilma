@@ -19,13 +19,13 @@ def activites_data(user_id,date):
                 emp_checkin_in = frappe.get_doc('Employee Checkin',check_in_time)
                 get_in_time = format_time(emp_checkin_in.time)
             else:
-                get_in_time = []   
+                get_in_time = ""  
             check_out_time = frappe.db.exists('Employee Checkin',{'employee':get_emp,'custom_punch_date':current_date,'log_type':'OUT'})
             if check_out_time:
                 emp_checkin_out = frappe.get_doc('Employee Checkin',check_out_time)
                 get_out_time = format_time(emp_checkin_out.time)
             else:
-                get_out_time = []    
+                get_out_time = ""    
         else:
             get_in_time = ""
         get_new_call = get_lead(user_id,date)
