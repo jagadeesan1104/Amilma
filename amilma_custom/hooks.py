@@ -201,12 +201,6 @@ fixtures = [{
             'Customer-custom_shop_inside_image','Customer-custom_longitude','Customer-custom_column_break_zaquo','Customer-custom_live_location','Customer-custom_latitude',
             'Customer-custom_gps_details',
 
-            #Lead Custom Field
-            'Lead-ice_cream_sales','Lead-custom_existing_ice_cream_brand','Lead-shop_daily_sales','Lead-custom_outlet_category',
-            'Lead-custom_outlet_type','Lead-tgr5','Lead-db','Lead-outlet_details','Lead-section_break_0','Lead-customer_group',
-            'Lead-custom_shop_inside_image','Lead-custom_shop_outside_image','Lead-custom_outlet_address','Lead-custom_live_location','Lead-custom_longitude',
-            'Lead-custom_column_break_8tavo','Lead-custom_latitude','Lead-custom_gps_details'
-
             #Contact Custom Field
             'Contact-custom_aaadhar_number'
 
