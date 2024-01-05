@@ -17,17 +17,20 @@ class MeltingClaim(Document):
 				if get_item_price:
 					if get_uom_and_pieces[1]:
 						get_rate = get_item_price / float(get_uom_and_pieces[1])
-						claim.rate = get_rate
-						claim.amount = float(claim.rate) * float(claim.req_qty)
+						claim.rate = get_rate or 0
+						claim.amount = float(claim.rate) * float(claim.req_qty) or 0
+
+						over_all_total_amount += claim.amount
+						self.net_total = over_all_total_amount
+
+						over_all_total_qty += float(claim.req_qty)
+						self.total_qty = over_all_total_qty
 					else:
 						frappe.throw(_('In Item No.of.Pieces Not Entered it is empty so not calculated the rate'))	
-					
-			over_all_total_amount += claim.amount
-			self.net_total = over_all_total_amount
-
-			over_all_total_qty += float(claim.req_qty)
-			self.total_qty = over_all_total_qty
-
+				else:
+					frappe.throw(_('Item Price List Not Created'))		
+			else:
+				frappe.throw(_('Item UOM has no Box Please Check the Item UOM'))
 
 @frappe.whitelist()
 def get_item_rate(item):
