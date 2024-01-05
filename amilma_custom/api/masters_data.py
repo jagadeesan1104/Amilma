@@ -13,6 +13,7 @@ def get_masters_data():
 		get_existing_type_data = get_existing_brand_volume()
 		get_distributor_data = get_distributor()
 		get_freezer = get_freezer_data()
+		get_area_sales_manager_data = get_area_sales_manager()
 
 		masters_data_list = {
 			"route_list":get_route_data,
@@ -23,6 +24,8 @@ def get_masters_data():
 			"existing_type_list":get_existing_type_data,
 			"db":get_distributor_data,
 			"freezer_data":get_freezer,		
+			"area_sales_manager":get_area_sales_manager_data
+
 		}
 		return {"status":True,"Masters Data":masters_data_list}
 	except:
@@ -68,6 +71,11 @@ def get_freezer_data():
 	freezer_data = frappe.db.get_all('Freezer Data',['make','model','capacity','basket','serial_no','freezer_deposit_status','freezer_deposit','transaction_reference_number','freezer_placed_date','distributor'])
 	return freezer_data
 
+#Area Sales Manager Masters Data
+def get_area_sales_manager():
+	area_sales_manager = frappe.db.get_all('Sales Partner',['name'])
+	return area_sales_manager
+
 #get the freezer data document id by filtering the 
 @frappe.whitelist()
 def get_freezer_data_documents(db):
@@ -76,6 +84,8 @@ def get_freezer_data_documents(db):
 		return {"status": True, "db": documents}
 	except:
 		return {"status": False}
+
+
 
 #outlet data against selecting the db in sales and purchase 
 @frappe.whitelist()
