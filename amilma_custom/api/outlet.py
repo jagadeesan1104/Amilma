@@ -138,11 +138,14 @@ def create_new_outlet_as_customer(user_id,db,route,customer_name,joining_year,ar
 @frappe.whitelist()
 def outlet_list(user_id):
     try:
-        outlet_api = frappe.db.get_all('Customer', {'owner': user_id} ,['*'])
-        formatted_outlet_list = []
+        get_customer = frappe.get_all('Customer', {'owner': user_id}, ['name','customer_group','custom_outlet_name','custom_outlet_category','joining_date_abbr',
+                                                                    'custom_customer_joining_date','custom_live_location','custom_outlet_type','custom_shop_daily_sales',
+                                                                    'custom_existing_brand','custom_ice_cream_sales'])
 
-        for outlet in outlet_api:
-            frezzer_data = frappe.db.get_all('Freezer Data',{'dealer':outlet.name},['name','make','model','capacity','basket','serial_no','freezer_deposit_status','freezer_deposit','mode_of_payment','transaction_reference_number','freezer_placed_date'])
+        outlet_data = []
+
+        for outlet in get_customer:
+            frezzer_data = frappe.db.get_all('Freezer Data',{'dealer':outlet['name']},['name','make','model','capacity','basket','serial_no','freezer_deposit_status','freezer_deposit','mode_of_payment','transaction_reference_number','freezer_placed_date'])
             if frezzer_data:
                 frezzer_data_list = frezzer_data
             else:
@@ -150,26 +153,25 @@ def outlet_list(user_id):
             get_address_list = get_outlet_address(outlet.name)
             get_personal_address_list = get_personal_address(outlet.name)
             outlet_list = {
-                "id":outlet.name,
-                "name":outlet.name,
-                "db":outlet.customer_group,
-                "outlet_name":outlet.custom_outlet_name,
-                "outlet_category":outlet.custom_outlet_category,
-                "joining_year":outlet.joining_year,
-                "customer_joining_date":outlet.custom_customer_joining_date,
-                "gps_location":outlet.custom_live_location,
-                "outlet_type":outlet.custom_outlet_type,
-                "shop_daily_sales":outlet.custom_shop_daily_sales,
-                "existing_brand":outlet.custom_existing_brand,
-                "ice_cream_sales":outlet.custom_ice_cream_sales,
-                "frezzer_data":frezzer_data_list,
-                "outlet_address":get_address_list,
-                "personal_address":get_personal_address_list
+                "id": outlet['name'] or "",
+                "name":outlet['name'] or "",
+                "db":outlet['customer_group'] or "",
+                "outlet_name":outlet['custom_outlet_name'] or "",
+                "outlet_category":outlet['custom_outlet_category'] or "",
+                "joining_year":outlet['joining_date_abbr'] or "",
+                "customer_joining_date":format_date(outlet['custom_customer_joining_date']) or "",
+                "gps_location":outlet['custom_live_location'] or "",
+                "outlet_type":outlet['custom_outlet_type'] or "",
+                "shop_daily_sales":outlet['custom_shop_daily_sales'] or "",
+                "existing_brand":outlet['custom_existing_brand'] or "",
+                "ice_cream_sales":outlet['custom_ice_cream_sales'] or "",
+                "frezzer_data":frezzer_data_list or "",
+                "outlet_address":get_address_list or "",
+                "personal_address":get_personal_address_list or ""
             }
+            outlet_data.append(outlet_list)
 
-            formatted_outlet_list.append(outlet_list)
-
-        return {"status": True, "outlet_list": outlet_list}
+        return {"status": True, "outlet_list": outlet_data}
     except :
         return {"status": False}
 

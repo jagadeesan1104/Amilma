@@ -193,14 +193,6 @@ fixtures = [{
         ["name", "in", [
             #opportunity Custom Field
             'Opportunity-custom_existing_brand_and_volume','Opportunity-custom_outlet_type','Opportunity-custom_outlet_category'
-
-            #Customer Custom Field
-            'Customer-custom_outlet_type','Customer-custom_outlet_category','Customer-outlet_type_abbr','Customer-customer_status','Customer-custom_db',
-            'Customer-outlet_type_abbr','Customer-custom_new_call_details','Customer-custom_outlet_name','Customer-custom_shop_daily_sales',
-            'Customer-custom_existing_brand','Customer-custom_ice_cream_sales','Customer-custom_column_break_1nzvh','Customer-custom_shop_outside_image',
-            'Customer-custom_shop_inside_image','Customer-custom_longitude','Customer-custom_column_break_zaquo','Customer-custom_live_location','Customer-custom_latitude',
-            'Customer-custom_gps_details',
-
             #Contact Custom Field
             'Contact-custom_aaadhar_number'
 

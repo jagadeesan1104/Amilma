@@ -229,12 +229,48 @@ def get_monthly_achieved_as_secondary(user_id):
 #     except:
 #         return get_secondary_monthly_achieved
 
-
+@frappe.whitelist()
 def new_calls_overall_data(user_id):
     try:
         current_date = today()
-        start_date = frappe.utils.data.get_first_day(today)
-        end_date = frappe.utils.data.get_last_day(today)
-        new_call = frappe.db.sql(""" select count(name) as total_leads from `tabLead` where creation >= """)
+        start_date = frappe.utils.data.get_first_day(current_date)
+        end_date = frappe.utils.data.get_last_day(current_date)
+        new_call = frappe.db.sql("""
+            SELECT COUNT(name) AS total_leads
+            FROM `tabLead`
+            WHERE DATE(creation) BETWEEN %s AND %s AND owner = %s
+        """, (start_date, end_date, user_id), as_dict=1)
+        return {"status":True,"new_call_count":new_call}
     except:
         pass
+
+
+def outlet_overall_data(user_id):
+    try:
+        current_date = today()
+        start_date = frappe.utils.data.get_first_day(current_date)
+        end_date = frappe.utils.data.get_last_day(current_date)
+        new_call = frappe.db.sql("""
+            SELECT COUNT(name) AS total_leads
+            FROM `tabCustomer`
+            WHERE DATE(creation) BETWEEN %s AND %s AND owner = %s
+        """, (start_date, end_date, user_id), as_dict=1)
+        return {"status":True,"new_call_count":new_call}
+    except:
+        pass
+
+@frappe.whitelist()
+def conversion_overall_data(user_id):
+    try:
+        current_date = today()
+        start_date = frappe.utils.data.get_first_day(current_date)
+        end_date = frappe.utils.data.get_last_day(current_date)
+        new_call = frappe.db.sql("""
+            SELECT COUNT(name) AS total_leads
+            FROM `tabCustomer`
+            WHERE DATE(creation) BETWEEN %s AND %s AND owner = %s AND name like 'CO'
+        """, (start_date, end_date, user_id), as_dict=1)
+        return {"status":True,"new_call_count":new_call}
+    except:
+        pass
+
