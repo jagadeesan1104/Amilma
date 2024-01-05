@@ -19,13 +19,13 @@ def activites_data(user_id,date):
                 emp_checkin_in = frappe.get_doc('Employee Checkin',check_in_time)
                 get_in_time = format_time(emp_checkin_in.time)
             else:
-                get_in_time = ""    
+                get_in_time = []   
             check_out_time = frappe.db.exists('Employee Checkin',{'employee':get_emp,'custom_punch_date':current_date,'log_type':'OUT'})
             if check_out_time:
                 emp_checkin_out = frappe.get_doc('Employee Checkin',check_out_time)
                 get_out_time = format_time(emp_checkin_out.time)
             else:
-                get_out_time = ""    
+                get_out_time = []    
         else:
             get_in_time = ""
         get_new_call = get_lead(user_id,date)
@@ -70,7 +70,7 @@ def get_lead(user_id,date):
     if lead:
         lead_data = lead
     else:
-        lead_data = ""    
+        lead_data = []   
     return lead_data    
 
 #get the customer datas            
@@ -91,7 +91,7 @@ def get_customer(user_id,date):
     if customer:
         customer_data = customer
     else:
-        customer_data = ""    
+        customer_data = []   
     return customer_data    
  
 #get purchase Order datas
@@ -112,7 +112,7 @@ def get_purchase_order(user_id,date):
     if get_po:
         po_data = get_po
     else:
-        po_data = ""    
+        po_data = []   
     return po_data
    
 #get sales Order data
@@ -133,7 +133,7 @@ def get_sales_order(user_id,date):
     if get_so:
         so_data = get_so
     else:
-        so_data = ""    
+        so_data = []   
     return so_data
 
 #get payment entry datas
@@ -154,7 +154,7 @@ def get_payment_entry(user_id,date):
     if payment_entry:
         payment_data = payment_entry
     else:
-        payment_data = ""    
+        payment_data = []    
     return payment_data  
 
 #get Melting Claim data
@@ -175,7 +175,7 @@ def get_melting_claim(user_id,date):
     if melting_data:
         melting_claim_data = melting_data
     else:
-        melting_claim_data = ""    
+        melting_claim_data = []  
     return melting_claim_data    
       
 
