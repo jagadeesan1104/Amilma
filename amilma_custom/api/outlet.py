@@ -21,7 +21,7 @@ def create_new_outlet_as_customer(user_id,db,route,customer_name,joining_year,ar
             #formatting the date
             joining_date_format = datetime.strptime(format_date(customer_joining_date), "%m-%d-%Y").date()
             freezer_date_format = datetime.strptime(format_date(freezer_date), "%m-%d-%Y").date()
-
+            
             #create a new customer
             new_outlet = frappe.get_doc({
                 'doctype':'Customer',
@@ -138,7 +138,7 @@ def create_new_outlet_as_customer(user_id,db,route,customer_name,joining_year,ar
 @frappe.whitelist()
 def outlet_list(user_id):
     try:
-        get_customer = frappe.get_all('Customer', {'owner': user_id}, ['name','customer_group','custom_outlet_name','custom_outlet_category','joining_date_abbr',
+        get_customer = frappe.get_all('Customer', {'owner': user_id}, ['name','customer_name','customer_group','territory','custom_outlet_name','custom_outlet_category','joining_date_abbr',
                                                                     'custom_customer_joining_date','custom_live_location','custom_outlet_type','custom_shop_daily_sales',
                                                                     'custom_existing_brand','custom_ice_cream_sales'])
 
@@ -155,7 +155,9 @@ def outlet_list(user_id):
             outlet_list = {
                 "id": outlet['name'] or "",
                 "name":outlet['name'] or "",
+                "customer_name":outlet['customer_name'],
                 "db":outlet['customer_group'] or "",
+                "route":outlet['territory'],
                 "outlet_name":outlet['custom_outlet_name'] or "",
                 "outlet_category":outlet['custom_outlet_category'] or "",
                 "joining_year":outlet['joining_date_abbr'] or "",
