@@ -507,23 +507,24 @@ def route_conversion(user_id,route):
         route_conversion_count = query_result[0].get('total_outlet_co', 0) 
     return route_conversion_count 
 
-# #get the overall active count created to pass the current date and get the current month data
-# def overall_active(user_id,route):
-#     route_conversion_count = 0
+#get the overall active count created to pass the current date and get the current month data
+# @frappe.whitelist()
+# def overall_active(route):
+#     overall_active_count = 0
 #     query_result = ""
 #     current_date = getdate(today())
 #     start_date = frappe.utils.data.get_first_day(current_date)
 #     end_date = frappe.utils.data.get_last_day(current_date)
 #     query_result = frappe.db.sql("""
-#         SELECT COUNT(name) AS total_leads
+#         SELECT *
 #         FROM `tabCustomer`
-#         WHERE DATE(creation) BETWEEN %s AND %s AND owner = %s AND name like 'CO' AND territory = %s
-#     """, (start_date, end_date, user_id,route), as_dict=1)
-#     if get_route_conversion:
-#         route_conversion_count = get_route_conversion
-#     else:
-#         route_conversion_count = []
-#     return route_conversion_count 
+#         WHERE DATE(creation) BETWEEN %s AND %s  AND territory = %s
+#     """, (start_date, end_date,route), as_dict=1)
+#     # if not query_result:
+#     #     overall_active_count = 0
+#     # else:
+#     #     overall_active_count = query_result[0].get('total_pull_out', 0) 
+#     return query_result 
    
 #get the overall_pullout status in freezer data
 def overall_pullout():

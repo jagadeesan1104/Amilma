@@ -24,7 +24,7 @@ def execute(filters=None):
 		data_v += f""" and  customer_group = '{filters.get('Customer_Group')}'  """
 
 
-	data = frappe.db.sql(f"""  select customer_name,name as cu_id, outlet_type,make,freezer_type,capacity,serial_no,   'InActive' as billedstatus from `tabCustomer`
+	data = frappe.db.sql(f"""  select customer_name,name as cu_id, outlet_type,make,freezer_type,capacity,serial_no,territory,   'InActive' as billedstatus from `tabCustomer`
 	  where disabled = 0 {data_v}   """,as_dict=1)
 	ddl = [l['customer_name'] for l in data]
 	# frappe.msgprint(dd2[3])
@@ -33,7 +33,7 @@ def execute(filters=None):
 	dd = frappe.db.sql(f""" 
 				select 
                   si.customer_name,
-				  ci.customer_joining_date,
+				  ci.custom_customer_joining_date,
 				  si.freezer_serial_no,
 					{dd2[1]}
 
@@ -134,6 +134,12 @@ def execute(filters=None):
 		{
 			"fieldname": "serial_no",
 			"label": "<b>Serial No</b>",
+			"fieldtype": "Data",
+			"width":  80
+		},
+		{
+			"fieldname": "territory",
+			"label": "<b>Route</b>",
 			"fieldtype": "Data",
 			"width":  80
 		},

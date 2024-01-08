@@ -195,9 +195,6 @@ fixtures = [{
             'Opportunity-custom_existing_brand_and_volume','Opportunity-custom_outlet_type','Opportunity-custom_outlet_category'
             #Contact Custom Field
             'Contact-custom_aaadhar_number'
-
-            #Sales order
-            'Sales Order-custom_api_method_marked'
         ]]
     ]
     },
