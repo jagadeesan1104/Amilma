@@ -28,6 +28,8 @@ def dashboard_activites(user_id,route):
             get_route_complaint = route_complaint(route)
             get_overall_dbpoint = overall_dbpoint()
             get_route_dbpoint = route_dbpoint(route)
+            # Employee Log Type Based on Checkin
+            emp_log_type = get_log_type(user_id)
         dashboard = {
             "activites":[
                 {
@@ -99,10 +101,25 @@ def dashboard_activites(user_id,route):
                     "route":get_route_dbpoint
                 }
             ],
+            "log_type":emp_log_type
         }
         return{'status':True,'Dashboard':dashboard}
     except Exception as e:
         return {"status":False}    
+
+#get_emp checkin log_type
+def get_log_type(user_id):
+    log_type = "OUT"
+    get_emp = frappe.db.get_value('Employee',{'status':'Active','user_id':user_id},['name'])
+    if get_emp:
+        get_emp_checkin =  frappe.db.get_value('Employee Checkin',{'employee':get_emp,'custom_punch_date':getdate(today())},['log_type'])
+        if get_emp_checkin:
+            log_type = get_emp_checkin
+        else:
+            log_type = "OUT"   
+    else:
+        log_type = "OUT"
+    return log_type        
 
 #*get the primary monthly target in monthly target row
 def get_monthly_target_as_primary(user_id):
