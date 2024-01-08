@@ -22,111 +22,121 @@ def create_new_outlet_as_customer(user_id,db,route,customer_name,joining_year,ar
             joining_date_format = datetime.strptime(format_date(customer_joining_date), "%m-%d-%Y").date()
             freezer_date_format = datetime.strptime(format_date(freezer_date), "%m-%d-%Y").date()
             
-            #create a new customer
-            new_outlet = frappe.get_doc({
-                'doctype':'Customer',
-                'customer_group':db,    
-                'default_price_list': "Standard Selling",
-                'joining_date_abbr':joining_year,
-                'default_sales_partner':area_sales_manager,
-                'custom_customer_joining_date':joining_date_format,
-                'custom_outlet_name':outlet_name,
-                'custom_outlet_category':outlet_category,
-                'territory':route,
-                'custom_outlet_type':outlet_type,
-                'custom_shop_daily_sales':shop_daily_sales,
-                'custom_existing_brand':existing_brand,
-                'custom_ice_cream_sales':ice_cream_sales,
-                'customer_name':customer_name,
-                'freezer_data':freezer_data,
-                'custom_latitude':latitude,
-                'custom_longitude':longitude,
-                'custom_live_location':live_location
-            })
-            new_outlet.insert(ignore_permissions=True)
-            frappe.db.commit()
-            frappe.db.set_value('Customer',new_outlet.name,'owner',user_id)
+            customer_name_already_exists = frappe.db.exists("Customer",{'customer_name':customer_name})
+            if not customer_name_already_exists:
+                new_outlet = frappe.get_doc({
+                    'doctype':'Customer',
+                    'customer_group':db,    
+                    'default_price_list': "Standard Selling",
+                    'joining_date_abbr':joining_year,
+                    'default_sales_partner':area_sales_manager,
+                    'custom_customer_joining_date':joining_date_format,
+                    'custom_outlet_name':outlet_name,
+                    'custom_outlet_category':outlet_category,
+                    'territory':route,
+                    'custom_outlet_type':outlet_type,
+                    'custom_shop_daily_sales':shop_daily_sales,
+                    'custom_existing_brand':existing_brand,
+                    'custom_ice_cream_sales':ice_cream_sales,
+                    'customer_name':customer_name,
+                    'freezer_data':freezer_data,
+                    'custom_latitude':latitude,
+                    'custom_longitude':longitude,
+                    'custom_live_location':live_location
+                })
+                new_outlet.insert(ignore_permissions=True)
+                frappe.db.commit()
+                frappe.db.set_value('Customer',new_outlet.name,'owner',user_id)
 
-            #base64 to image ship_inside_image
-            file_name_inside = f"{new_outlet.name.replace(' ', '_')}_image.png"
-            new_file_inside = frappe.new_doc('File')
-            new_file_inside.file_name = file_name_inside
-            new_file_inside.content = decoded_data_inside
-            new_file_inside.attached_to_doctype = "Customer"
-            new_file_inside.attached_to_name = new_outlet.name
-            new_file_inside.attached_to_field = "custom_shop_inside_image"
-            new_file_inside.is_private = 0
-            new_file_inside.save(ignore_permissions=True)
-            frappe.db.commit()
+                #base64 to image ship_inside_image
+                if shop_inside_image:
+                    file_name_inside = f"{new_outlet.name.replace(' ', '_')}_image.png"
+                    new_file_inside = frappe.new_doc('File')
+                    new_file_inside.file_name = file_name_inside
+                    new_file_inside.content = decoded_data_inside
+                    new_file_inside.attached_to_doctype = "Customer"
+                    new_file_inside.attached_to_name = new_outlet.name
+                    new_file_inside.attached_to_field = "custom_shop_inside_image"
+                    new_file_inside.is_private = 0
+                    new_file_inside.save(ignore_permissions=True)
+                    frappe.db.commit()
 
-            frappe.db.set_value('Customer',new_outlet.name,'custom_shop_inside_image',new_file_inside.file_url)
-            #shop_outside_image
-            file_name_outside = f"{new_outlet.name.replace(' ', '_')}_image.png"
-            new_file_outside = frappe.new_doc('File')
-            new_file_outside.file_name = file_name_outside
-            new_file_outside.content = decoded_data_outside
-            new_file_outside.attached_to_doctype = "Customer"
-            new_file_outside.attached_to_name = new_outlet.name
-            new_file_outside.attached_to_field = "custom_shop_outside_image"
-            new_file_outside.is_private = 0
-            new_file_outside.save(ignore_permissions=True)
-            frappe.db.commit()
+                    frappe.db.set_value('Customer',new_outlet.name,'custom_shop_inside_image',new_file_inside.file_url)
+                else:
+                    status = False    
 
-            frappe.db.set_value('Customer',new_outlet.name,'custom_shop_outside_image',new_file_outside.file_url)
+                #shop_outside_image
+                if shop_outside_image:
+                    file_name_outside = f"{new_outlet.name.replace(' ', '_')}_image.png"
+                    new_file_outside = frappe.new_doc('File')
+                    new_file_outside.file_name = file_name_outside
+                    new_file_outside.content = decoded_data_outside
+                    new_file_outside.attached_to_doctype = "Customer"
+                    new_file_outside.attached_to_name = new_outlet.name
+                    new_file_outside.attached_to_field = "custom_shop_outside_image"
+                    new_file_outside.is_private = 0
+                    new_file_outside.save(ignore_permissions=True)
+                    frappe.db.commit()
 
-            ##create outlet_Address
-            split_address = outlet_address.split(',')
-            address = frappe.new_doc('Address')
-            address.address_title = new_outlet.name
-            address.address_type = "Billing"
-            address.address_line1 = outlet_address
-            split_city = split_address[-1].split('-')
-            address.city = split_city[0]
-            address.pincode = split_city[-1]
-            address_child_table = address.append('links',{})
-            address_child_table.link_doctype = "Customer"
-            address_child_table.link_name = new_outlet.name
-            address.insert(ignore_permissions=True)
-            frappe.db.commit()
+                    frappe.db.set_value('Customer',new_outlet.name,'custom_shop_outside_image',new_file_outside.file_url)
+                else:
+                    status = False    
 
-            #create address for contact
-            split_address = personal_address.split(',')
-            pers_addrs = frappe.new_doc('Address')
-            pers_addrs.address_title = owner_name
-            pers_addrs.address_type = "Personal"
-            pers_addrs.address_line1 = personal_address
-            split_city = split_address[-1].split('-')
-            pers_addrs.city = split_city[0]
-            pers_addrs.pincode = split_city[-1]
-            pers_addrs.phone = alternate_number
-            pers_addrs.insert(ignore_permissions=True)
-            frappe.db.commit()
+                ##create outlet_Address
+                split_address = outlet_address.split(',')
+                address = frappe.new_doc('Address')
+                address.address_title = new_outlet.name
+                address.address_type = "Billing"
+                address.address_line1 = outlet_address
+                split_city = split_address[-1].split('-')
+                address.city = split_city[0]
+                address.pincode = split_city[-1]
+                address_child_table = address.append('links',{})
+                address_child_table.link_doctype = "Customer"
+                address_child_table.link_name = new_outlet.name
+                address.insert(ignore_permissions=True)
+                frappe.db.commit()
 
-            #create contact for personal details
-            contact = frappe.new_doc('Contact')
-            contact.first_name = owner_name
-            contact.custom_father_guardian_name = father_name
-            contact.custom_aaadhar_number = aadhar_number
-            contact.address = pers_addrs.name
-            email_child_table = contact.append('email_ids',{})
-            email_child_table.email_id = email_id
-            number_child_table = contact.append('phone_nos',{})
-            number_child_table.phone = mobile_number
-            link_child_table = contact.append('links',{})
-            link_child_table.link_doctype = "Customer"
-            link_child_table.link_name = new_outlet.name
-            contact.insert(ignore_permissions=True)
-            frappe.db.commit()
+                #create address for contact
+                split_address = personal_address.split(',')
+                pers_addrs = frappe.new_doc('Address')
+                pers_addrs.address_title = owner_name
+                pers_addrs.address_type = "Personal"
+                pers_addrs.address_line1 = personal_address
+                split_city = split_address[-1].split('-')
+                pers_addrs.city = split_city[0]
+                pers_addrs.pincode = split_city[-1]
+                pers_addrs.phone = alternate_number
+                pers_addrs.insert(ignore_permissions=True)
+                frappe.db.commit()
 
-            #update the freezer transaction number and date
-            update_freezer = frappe.get_doc('Freezer Data',{'name':new_outlet.freezer_data})
-            update_freezer.mode_of_payment = mode_of_payment
-            update_freezer.transaction_reference_number = transaction_number
-            update_freezer.freezer_placed_date = freezer_date_format
-            update_freezer.save(ignore_permissions=True)
-            frappe.db.commit()
-            status = True
-            message = "New Outlet Created Successfully"
+                #create contact for personal details
+                contact = frappe.new_doc('Contact')
+                contact.first_name = owner_name
+                contact.custom_father_guardian_name = father_name
+                contact.custom_aaadhar_number = aadhar_number
+                contact.address = pers_addrs.name
+                email_child_table = contact.append('email_ids',{})
+                email_child_table.email_id = email_id
+                number_child_table = contact.append('phone_nos',{})
+                number_child_table.phone = mobile_number
+                link_child_table = contact.append('links',{})
+                link_child_table.link_doctype = "Customer"
+                link_child_table.link_name = new_outlet.name
+                contact.insert(ignore_permissions=True)
+                frappe.db.commit()
+
+                #update the freezer transaction number and date
+                update_freezer = frappe.get_doc('Freezer Data',{'name':freezer_data})
+                update_freezer.mode_of_payment = mode_of_payment
+                update_freezer.transaction_reference_number = transaction_number
+                update_freezer.freezer_placed_date = freezer_date_format
+                update_freezer.save(ignore_permissions=True)
+                frappe.db.commit()
+                status = True
+                message = "New Outlet Created Successfully"
+            else:
+                status = False    
         else:
             message = "Employee have no record" 
         return {"status":status,"message":message}

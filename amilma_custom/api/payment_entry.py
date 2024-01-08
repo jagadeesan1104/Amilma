@@ -1,84 +1,57 @@
 import frappe
 from frappe.utils import now,getdate,today,format_date,nowdate,add_months
 from datetime import datetime
-from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry,get_reference_as_per_payment_terms
+from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry
 
 
 
 @frappe.whitelist()
-def create_payment_entry(user_id,db,outlet,posting_date,mode_of_payment,paid_amount,reference_no,invoice_id):
+def create_payment_entry(user_id,db,outlet,posting_date,paid_amount,mode_of_payment,reference_no,date,invoice_id):
     status = ""
     message = ""
-    status = ""
     posting_date_format = datetime.strptime(format_date(posting_date), "%m-%d-%Y").date()
-    # refrence_date = datetime.strptime(format_date(date), "%d-%m-%Y").date()
+    refrence_date = datetime.strptime(format_date(date), "%d-%m-%Y").date()
     try:
-        payment_entry_references = frappe.parse_json(invoice_id)
         check_user_id = frappe.db.exists('User',{'name':user_id})
         if check_user_id:
             account_paid_to = get_payment_entry_account_paid_to(db)
-            for invoice_data in payment_entry_references:
-                invoice_id = invoice_data.get("id")
-                get_sales_invoice = frappe.get_doc("Sales Invoice", invoice_id)
-            # payment_entry = get_payment_entry("Sales Invoice",get_sales_invoice.name)
-            # payment_entry.flags.ignore_mandatory = True
-            # payment_entry.company = db
-            # payment_entry.posting_date = posting_date_format
-            # payment_entry.mode_of_payment = mode_of_payment
-            # payment_entry.payment_type = "Receive" 
-            # payment_entry.party_type = "Customer"
-            # payment_entry.party = outlet
-            # payment_entry.reference_no = get_sales_invoice.name
-            # payment_entry.paid_to = account_paid_to
-            # payment_entry.paid_amount = paid_amount
-            # payment_entry.received_amount = paid_amount
-            # payment_entry.insert(ignore_permissions=True)
-            # payment_entry.save()
-
-            # frappe.db.set_value("Payment Entry",payment_entry.name,"owner",user_id)
+            get_sales_invoice = frappe.get_doc("Sales Invoice", invoice_id)
+            dt = "Sales Invoice"
+            dn = get_sales_invoice.name
+            payment_entry = get_payment_entry(dt,dn)
+            payment_entry.flags.ignore_mandatory = True
+            payment_entry.company = db
+            payment_entry.posting_date = posting_date_format
+            payment_entry.mode_of_payment = mode_of_payment
+            payment_entry.payment_type = "Receive" 
+            payment_entry.party_type = "Customer"
+            payment_entry.party = outlet
+            payment_entry.reference_no = reference_no
+            payment_entry.reference_date = refrence_date
+            payment_entry.paid_to = account_paid_to
+            payment_entry.paid_amount = paid_amount
+            payment_entry.received_amount = paid_amount
+            payment_entry.insert(ignore_permissions=True)
+            payment_entry.save()
+            frappe.db.set_value("Payment Entry",payment_entry.name,"owner",user_id)
             status = True
             message = "New Payment Entry Created"
-            
-            # new_payment_entry = frappe.new_doc('Payment Entry')
-            # new_payment_entry.company = db
-            # new_payment_entry.posting_date = posting_date_format
-            # new_payment_entry.mode_of_payment = mode_of_payment
-            # new_payment_entry.payment_type = "Receive"
-            # new_payment_entry.party_type = "Customer"
-            # new_payment_entry.party = outlet
-            # new_payment_entry.paid_to = account_paid_to
-            # new_payment_entry.paid_amount = paid_amount
-            # new_payment_entry.received_amount = paid_amount
-            # for payment in payment_entry_references:
-            #     new_payment_entry.append("references",{
-            #         "reference_doctype":payment.get("reference_doctype"),
-            #         "reference_name": payment.get("reference_name")
-            #     })
-            # new_payment_entry.save(ignore_permissions=True)
-            # frappe.db.commit()
-            
-
-            
         else:
             status = False
-        return {"status":status,"message":payment_entry_references}    
+        return {"status":status,"message":message}    
     except:
         status = False
         return{"status":status}    
 
-
-
 def get_payment_entry_account_paid_to(company):
     get_account_paid_to = frappe.db.get_value('Account',{'company':company,'account_type':"Cash"},['name'])
     return get_account_paid_to
-
 
 #payment entry list
 @frappe.whitelist()
 def payment_entry_list(user_id):
     try:
         payment_entry_list = frappe.get_all('Payment Entry', {'owner': user_id}, ['*'])
-
         formatted_payment_list = []
         for payment_entry in payment_entry_list:
             net_balance = payment_entry.difference_amount - payment_entry.total_allocated_amount
