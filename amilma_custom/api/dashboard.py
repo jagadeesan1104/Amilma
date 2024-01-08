@@ -71,14 +71,14 @@ def dashboard_activites(user_id,route):
                 {
                     "description": "Active",
                     "key":6,
-                    "overall":"12",
-                    "route":"15"
+                    "overall":0,
+                    "route":0
                 },
                 {
                     "description": "Inactive",
                     "key":7,
-                    "overall":"12",
-                    "route":"15"
+                    "overall":0,
+                    "route":0
                 },
                 {
                     "description": "Pullout",
