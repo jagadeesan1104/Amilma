@@ -14,6 +14,7 @@ def get_masters_data():
 		get_distributor_data = get_distributor()
 		get_freezer = get_freezer_data()
 		get_area_sales_manager_data = get_area_sales_manager()
+		get_sales_invoice_data = get_sales_invoice_id()
 
 		masters_data_list = {
 			"route_list":get_route_data,
@@ -24,7 +25,8 @@ def get_masters_data():
 			"existing_type_list":get_existing_type_data,
 			"db":get_distributor_data,
 			"freezer_data":get_freezer,		
-			"area_sales_manager":get_area_sales_manager_data
+			"area_sales_manager":get_area_sales_manager_data,
+			"sales_invoice_id":get_sales_invoice_data
 
 		}
 		return {"status":True,"Masters Data":masters_data_list}
@@ -75,6 +77,12 @@ def get_freezer_data():
 def get_area_sales_manager():
 	area_sales_manager = frappe.db.get_all('Sales Partner',['name'])
 	return area_sales_manager
+
+#Sales Invoice ID Data
+def get_sales_invoice_id():
+	sales_invoices = frappe.db.get_all("Sales Invoice", filters={'status': ['not in', ['Paid']],'docstatus':1}, fields=['name'])
+	return sales_invoices
+
 
 #get the freezer data document id by filtering the 
 @frappe.whitelist()
