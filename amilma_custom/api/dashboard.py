@@ -524,25 +524,86 @@ def route_conversion(user_id,route):
         route_conversion_count = query_result[0].get('total_outlet_co', 0) 
     return route_conversion_count 
 
-#get the overall active count created to pass the current date and get the current month data
-# @frappe.whitelist()
-# def overall_active(route):
-#     overall_active_count = 0
-#     query_result = ""
-#     current_date = getdate(today())
-#     start_date = frappe.utils.data.get_first_day(current_date)
-#     end_date = frappe.utils.data.get_last_day(current_date)
-#     query_result = frappe.db.sql("""
-#         SELECT *
-#         FROM `tabCustomer`
-#         WHERE DATE(creation) BETWEEN %s AND %s  AND territory = %s
-#     """, (start_date, end_date,route), as_dict=1)
-#     # if not query_result:
-#     #     overall_active_count = 0
-#     # else:
-#     #     overall_active_count = query_result[0].get('total_pull_out', 0) 
-#     return query_result 
-   
+# get the overall active count created to pass the current date and get the current month data
+def overall_active(user_id):
+    active_count = 0
+    get_company = frappe.db.get_value("Employee",{'status':"Active",'user_id':user_id},['company'])
+    if get_company:
+        invoice_amount = get_overall_sales_invoice(get_company)
+        if float(invoice_amount[0]['total']) > 2000.0:
+            active_count += 1
+        else:
+            active_count = 0
+    else:
+        active_count = 0    
+    return active_count
+
+def overall_inactive(user_id):
+    inactive_count = 0
+    get_company = frappe.db.get_value("Employee",{'status':"Active",'user_id':user_id},['company'])
+    if get_company:
+        invoice_amount = get_overall_sales_invoice(get_company)
+        if float(invoice_amount[0]['total']) < 2000.0:
+            active_count += 1
+        else:
+            inactive_count = 0
+    else:
+        inactive_count = 0        
+    return inactive_count
+
+def get_overall_sales_invoice(company):
+    current_date = getdate(today())
+    start_date = frappe.utils.data.get_first_day(current_date)
+    end_date = frappe.utils.data.get_last_day(current_date)
+
+    overall_sales_invoice = frappe.db.sql("""
+        SELECT COALESCE(SUM(rounded_total), 0) AS total
+        FROM `tabSales Invoice`
+        WHERE posting_date BETWEEN %s AND %s AND company = %s
+    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), company), as_dict=True)
+    return overall_sales_invoice
+
+# get the overall active count created to pass the current date and get the current month data
+def route_active(route):
+    active_count = 0
+    get_customers = frappe.db.get_all('Customer', {'territory': route}, ['name'])
+    if get_customers:
+        for customer in get_customers:
+            invoice_amount = get_sales_invoice_amount(customer.name)
+            if float(invoice_amount[0]['total']) > 2000.0:
+                active_count += 1
+            else:
+                active_count = 0
+    else:
+        active_count = 0
+    return active_count  
+
+def route_inactive(route):
+    inactive_count = 0
+    get_customers = frappe.db.get_all('Customer', {'territory': route}, ['name'])
+    if get_customers:
+        for customer in get_customers:
+            invoice_amount = get_sales_invoice_amount(customer.name)
+            if float(invoice_amount[0]['total']) < 2000.0:
+                inactive_count += 1
+            else:
+                inactive_count = 0
+    else:
+        inactive_count = 0
+    return inactive_count                
+
+def get_sales_invoice_amount(customer):
+    current_date = getdate(today())
+    start_date = frappe.utils.data.get_first_day(current_date)
+    end_date = frappe.utils.data.get_last_day(current_date)
+
+    sales_invoice_amount = frappe.db.sql("""
+        SELECT COALESCE(SUM(rounded_total), 0) AS total
+        FROM `tabSales Invoice`
+        WHERE posting_date BETWEEN %s AND %s AND customer = %s
+    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), customer), as_dict=True)
+    return sales_invoice_amount
+
 #get the overall_pullout status in freezer data
 def overall_pullout():
     overall_pullout_count = 0
