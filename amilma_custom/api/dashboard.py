@@ -5,7 +5,7 @@ from datetime import datetime
 
 #the below code is for APK Dashboard activites page list the number of datas
 @frappe.whitelist()
-def dashboard_activites(user_id,route):
+def dashboard_activites(user_id,db,route):
     try:
         get_user = frappe.db.exists("User",{'name':user_id})
         if get_user:
@@ -417,17 +417,24 @@ def get_today_achieved_as_secondary(user_id):
     return get_today_achieved_as_secondary
 
 #get the overall lead count created to pass the current date and get the current month data
-def new_calls_overall(user_id):
+def new_calls_overall(db):
     overall_lead_count = 0
     query_result = ""
     current_date = getdate(today())
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-    query_result = frappe.db.sql("""
-        SELECT COUNT(name) AS total_leads
-        FROM `tabLead`
-        WHERE date(creation) BETWEEN %s AND %s AND owner = %s
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), user_id), as_dict=1)
+    if db:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_leads
+            FROM `tabLead`
+            WHERE date(creation) BETWEEN %s AND %s AND company = %s
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), db), as_dict=1)
+    else:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_leads
+            FROM `tabLead`
+            WHERE date(creation) BETWEEN %s AND %s
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)
     if not query_result:
         overall_lead_count = 0
     else:
@@ -435,17 +442,24 @@ def new_calls_overall(user_id):
     return overall_lead_count
 
 #get the route lead count created to pass the current date and get the current month data
-def new_calls_route(user_id,route):
+def new_calls_route(route):
     route_lead_count = 0
     query_result = ""
     current_date = getdate(today())
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-    query_result = frappe.db.sql("""
-        SELECT COUNT(name) AS total_leads
-        FROM `tabLead`
-        WHERE date(creation) BETWEEN %s AND %s AND owner = %s AND  territory = %s
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), user_id, route), as_dict=1)
+    if route:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_leads
+            FROM `tabLead`
+            WHERE date(creation) BETWEEN %s AND %s AND  territory = %s
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),route), as_dict=1)
+    else:    
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_leads
+            FROM `tabLead`
+            WHERE date(creation) BETWEEN %s AND %s 
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)
     if not query_result:
         route_lead_count = 0
     else:
@@ -453,17 +467,24 @@ def new_calls_route(user_id,route):
     return route_lead_count        
 
 #⁡⁢⁢⁣get the overall outlet count created to pass the current date and get the current month data
-def outlet_overall(user_id):
+def outlet_overall(db):
     overall_outlet_count = 0
     query_result = ""
     current_date = getdate(today())
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-    query_result = frappe.db.sql("""
-        SELECT COUNT(name) AS total_outlet
-        FROM `tabCustomer`
-        WHERE date(creation) BETWEEN %s AND %s AND owner = %s 
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), user_id), as_dict=1)
+    if db:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_outlet
+            FROM `tabCustomer`
+            WHERE date(creation) BETWEEN %s AND %s AND customer_name = %s 
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),db), as_dict=1)
+    else:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_outlet
+            FROM `tabCustomer`
+            WHERE date(creation) BETWEEN %s AND %s
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)
     if not query_result:
         overall_outlet_count = 0
     else:
@@ -471,17 +492,24 @@ def outlet_overall(user_id):
     return overall_outlet_count        
    
 #get the route outlet count created to pass the current date and get the current month data
-def outlet_route(user_id,route):
+def outlet_route(route):
     route_outlet_count = 0
     query_result = ""
     current_date = getdate(today())
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-    query_result = frappe.db.sql("""
-        SELECT COUNT(name) AS total_outlet
-        FROM `tabCustomer`
-        WHERE date(creation) BETWEEN %s AND %s AND owner = %s AND  territory = %s
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), user_id, route), as_dict=1)
+    if route:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_outlet
+            FROM `tabCustomer`
+            WHERE date(creation) BETWEEN %s AND %s AND  territory = %s
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), route), as_dict=1)
+    else:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_outlet
+            FROM `tabCustomer`
+            WHERE date(creation) BETWEEN %s AND %s 
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)    
     if not query_result:
         route_outlet_count = 0
     else:
@@ -489,17 +517,24 @@ def outlet_route(user_id,route):
     return route_outlet_count
 
 #get the overall conversion count created to pass the current date and get the current month data
-def overall_conversion(user_id):
+def overall_conversion(db):
     overall_conversion_count = 0
     query_result = ""
     current_date = getdate(today())
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-    query_result = frappe.db.sql("""
-        SELECT COUNT(name) AS total_outlet_co
-        FROM `tabCustomer`
-        WHERE date(creation) BETWEEN %s AND %s AND owner = %s AND name like 'CO'
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), user_id), as_dict=1)
+    if db:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_outlet_co
+            FROM `tabCustomer`
+            WHERE date(creation) BETWEEN %s AND %s AND customer_name = %s AND name like 'CO'
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),db), as_dict=1)
+    else:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_outlet_co
+            FROM `tabCustomer`
+            WHERE date(creation) BETWEEN %s AND %s AND name like 'CO'
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)
     if not query_result:
         overall_conversion_count = 0
     else:
@@ -507,17 +542,24 @@ def overall_conversion(user_id):
     return overall_conversion_count
 
 #get the route conversion count created to pass the current date and get the current month data
-def route_conversion(user_id,route):
+def route_conversion(route):
     route_conversion_count = 0
     query_result = ""
     current_date = getdate(today())
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-    query_result = frappe.db.sql("""
-        SELECT COUNT(name) AS total_outlet_co
-        FROM `tabCustomer`
-        WHERE date(creation) BETWEEN %s AND %s AND owner = %s AND name like 'CO' AND  territory = %s
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), user_id,route), as_dict=1)
+    if route:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_outlet_co
+            FROM `tabCustomer`
+            WHERE date(creation) BETWEEN %s AND %s AND name like 'CO' AND  territory = %s
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),route), as_dict=1)
+    else:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_outlet_co
+            FROM `tabCustomer`
+            WHERE date(creation) BETWEEN %s AND %s AND name like 'CO' 
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)
     if not query_result:
         route_conversion_count = 0
     else:
@@ -605,17 +647,24 @@ def get_sales_invoice_amount(customer):
     return sales_invoice_amount
 
 #get the overall_pullout status in freezer data
-def overall_pullout():
+def overall_pullout(db):
     overall_pullout_count = 0
     query_result = ""
     current_date = getdate(today())
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-    query_result = frappe.db.sql("""
-        SELECT COUNT(name) AS total_pull_out
-        FROM `tabFreezer Data`
-        WHERE date(creation) BETWEEN %s AND %s AND status = "Pullout"
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)
+    if db:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_pull_out
+            FROM `tabFreezer Data`
+            WHERE date(creation) BETWEEN %s AND %s AND status = "Pullout" AND distributor_name = %s
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),db),as_dict=1)
+    else:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_pull_out
+            FROM `tabFreezer Data`
+            WHERE date(creation) BETWEEN %s AND %s AND status = "Pullout" 
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')),as_dict=1)   
     if not query_result:
         overall_pullout_count = 0
     else:
@@ -629,11 +678,18 @@ def route_pullout(route):
     current_date = getdate(today())
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-    query_result = frappe.db.sql("""
-        SELECT COUNT(name) AS total_pull_out
-        FROM `tabFreezer Data`
-        WHERE date(creation) BETWEEN %s AND %s AND territory = %s AND status = "Pullout"
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),route), as_dict=1)
+    if route:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_pull_out
+            FROM `tabFreezer Data`
+            WHERE date(creation) BETWEEN %s AND %s AND territory = %s AND status = "Pullout"
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),route), as_dict=1)
+    else:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS total_pull_out
+            FROM `tabFreezer Data`
+            WHERE date(creation) BETWEEN %s AND %s AND status = "Pullout"
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)
     if not query_result:
         route_pullout_count = 0
     else:
@@ -641,17 +697,24 @@ def route_pullout(route):
     return route_pullout_count 
 
 #get the overall_compliant status in freezer data
-def overall_complaint():
+def overall_complaint(db):
     overall_compliant_count = 0
     query_result = ""
     current_date = getdate(today())
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-    query_result = frappe.db.sql("""
-        SELECT COUNT(name) AS complaint
-        FROM `tabFreezer Data`
-        WHERE date(creation) BETWEEN %s AND %s AND status = "Complaint"
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)
+    if db:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS complaint
+            FROM `tabFreezer Data`
+            WHERE date(creation) BETWEEN %s AND %s AND status = "Complaint" AND distributor_name = %s
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),db), as_dict=1)
+    else:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS complaint
+            FROM `tabFreezer Data`
+            WHERE date(creation) BETWEEN %s AND %s AND status = "Complaint"
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)   
     if not query_result:
         overall_compliant_count = 0
     else:
@@ -665,11 +728,18 @@ def route_complaint(route):
     current_date = getdate(today())
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-    query_result = frappe.db.sql("""
-        SELECT COUNT(name) AS complaint
-        FROM `tabFreezer Data`
-        WHERE date(creation) BETWEEN %s AND %s AND territory = %s AND status = "Complaint"
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),route), as_dict=1)
+    if route:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS complaint
+            FROM `tabFreezer Data`
+            WHERE date(creation) BETWEEN %s AND %s AND territory = %s AND status = "Complaint"
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),route), as_dict=1)
+    else:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS complaint
+            FROM `tabFreezer Data`
+            WHERE date(creation) BETWEEN %s AND %s  AND status = "Complaint"
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1) 
     if not query_result:
         route_complaint_count = 0
     else:
@@ -677,17 +747,24 @@ def route_complaint(route):
     return route_complaint_count 
 
 #get the overall_dbpoint status in freezer data
-def overall_dbpoint():
+def overall_dbpoint(db):
     overall_dbpoint_count = 0
     query_result = ""
     current_date = getdate(today())
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-    query_result = frappe.db.sql("""
-        SELECT COUNT(name) AS dbpoint
-        FROM `tabFreezer Data`
-        WHERE date(creation) BETWEEN %s AND %s AND status = "DB Point"
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)
+    if db:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS dbpoint
+            FROM `tabFreezer Data`
+            WHERE date(creation) BETWEEN %s AND %s AND status = "DB Point"  AND distributor_name = %s
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),db), as_dict=1)
+    else:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS dbpoint
+            FROM `tabFreezer Data`
+            WHERE date(creation) BETWEEN %s AND %s AND status = "DB Point"
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)    
     if not query_result:
         overall_dbpoint_count = 0
     else:
@@ -701,11 +778,18 @@ def route_dbpoint(route):
     current_date = getdate(today())
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-    query_result = frappe.db.sql("""
-        SELECT COUNT(name) AS dbpoint
-        FROM `tabFreezer Data`
-        WHERE date(creation) BETWEEN %s AND %s AND territory = %s AND status = "DB Point"
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),route), as_dict=1)
+    if route:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS dbpoint
+            FROM `tabFreezer Data`
+            WHERE date(creation) BETWEEN %s AND %s AND territory = %s AND status = "DB Point"
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),route), as_dict=1)
+    else:
+        query_result = frappe.db.sql("""
+            SELECT COUNT(name) AS dbpoint
+            FROM `tabFreezer Data`
+            WHERE date(creation) BETWEEN %s AND %s AND territory = %s AND status = "DB Point"
+        """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),route), as_dict=1)   
     if not query_result:
         route_dbpoint_count = 0
     else:
