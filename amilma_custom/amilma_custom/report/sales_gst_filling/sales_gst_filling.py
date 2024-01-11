@@ -31,9 +31,9 @@ def get_columns(filters):
 def get_data(filters):
 	data = []
 	if filters.company:
-		get_sales_invoice = frappe.db.get_all("Sales Invoice",{'docstatus':1,'posting_date':('between',(filters.from_date,filters.to_date)),'company':filters.company},['customer_name','tax_id','posting_date','name','base_net_total','rounded_total'])
+		get_sales_invoice = frappe.db.get_all("Sales Invoice",{'docstatus':('!=',0),'posting_date':('between',(filters.from_date,filters.to_date)),'company':filters.company},['customer_name','tax_id','posting_date','name','base_net_total','rounded_total'])
 	else:
-		get_sales_invoice = frappe.db.get_all("Sales Invoice",{'docstatus':1,'posting_date':('between',(filters.from_date,filters.to_date))},['customer_name','tax_id','posting_date','name','base_net_total','rounded_total'])
+		get_sales_invoice = frappe.db.get_all("Sales Invoice",{'docstatus':('!=',0),'posting_date':('between',(filters.from_date,filters.to_date))},['customer_name','tax_id','posting_date','name','base_net_total','rounded_total'])
 	for sales in get_sales_invoice:
 			sgst_tax_amount = get_sgst_tax_amount(sales.name)
 			cgst_tax_amount = get_cgst_tax_amount(sales.name)
