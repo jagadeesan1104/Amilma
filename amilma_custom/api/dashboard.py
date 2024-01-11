@@ -15,18 +15,22 @@ def dashboard_activites(user_id,db,route):
             secondary_monthly_achieved = get_monthly_achieved_as_secondary(user_id)
             primary_today_achieved = get_today_achieved_as_primary(user_id)
             secondary_today_achieved = get_monthly_achieved_as_secondary(user_id)
-            #Your Works Methods
-            overall_lead = new_calls_overall(user_id)
-            route_lead = new_calls_route(user_id,route)
-            overall_customer = outlet_overall(user_id)
-            route_customer = outlet_route(user_id,route)
-            overall_customer_co = overall_conversion(user_id)
-            route_customer_co = route_conversion(user_id,route)
-            get_overall_pullout = overall_pullout()
+            # Your Works Methods
+            overall_lead = new_calls_overall(db)
+            route_lead = new_calls_route(route)
+            overall_customer = outlet_overall(db)
+            route_customer = outlet_route(route)
+            overall_customer_co = overall_conversion(db)
+            route_customer_co = route_conversion(route)
+            get_overall_active = overall_active(user_id)
+            get_overall_inactive = overall_inactive(user_id)
+            get_route_active = route_active(route)
+            get_route_inactive = route_inactive(route)
+            get_overall_pullout = overall_pullout(db)
             get_route_pullout = route_pullout(route)
-            get_overall_complaint = overall_complaint()
+            get_overall_complaint = overall_complaint(db)
             get_route_complaint = route_complaint(route)
-            get_overall_dbpoint = overall_dbpoint()
+            get_overall_dbpoint = overall_dbpoint(db)
             get_route_dbpoint = route_dbpoint(route)
             # Employee Log Type Based on Checkin
             emp_log_type = get_log_type(user_id)
@@ -73,14 +77,14 @@ def dashboard_activites(user_id,db,route):
                 {
                     "description": "Active",
                     "key":6,
-                    "overall":0,
-                    "route":0
+                    "overall":get_overall_active,
+                    "route":get_route_active
                 },
                 {
                     "description": "Inactive",
                     "key":7,
-                    "overall":0,
-                    "route":0
+                    "overall":get_overall_inactive,
+                    "route":get_route_inactive
                 },
                 {
                     "description": "Pullout",
@@ -788,7 +792,7 @@ def route_dbpoint(route):
         query_result = frappe.db.sql("""
             SELECT COUNT(name) AS dbpoint
             FROM `tabFreezer Data`
-            WHERE date(creation) BETWEEN %s AND %s AND territory = %s AND status = "DB Point"
+            WHERE date(creation) BETWEEN %s AND %s  AND status = "DB Point"
         """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),route), as_dict=1)   
     if not query_result:
         route_dbpoint_count = 0
