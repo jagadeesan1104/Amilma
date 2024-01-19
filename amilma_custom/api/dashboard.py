@@ -21,6 +21,8 @@ def dashboard_activites(user_id,db,route):
                 overall_lead = new_calls_overall_with_db(db)
                 overall_customer = outlet_overall_with_db(db)
                 overall_customer_co = overall_conversion_with_db(db)
+                get_overall_active = overall_active_with_company(db)
+                get_overall_inactive = overall_inactive_with_company(db)
                 get_overall_pullout = overall_pullout_with_db(db)
                 get_overall_complaint = overall_complaint_with_db(db)
                 get_overall_dbpoint = overall_dbpoint_with_db(db)   
@@ -28,14 +30,18 @@ def dashboard_activites(user_id,db,route):
                 overall_lead = new_calls_overall_without_db()
                 overall_customer = outlet_overall_without_db()
                 overall_customer_co = overall_conversion_without_db()
+                get_overall_active = overall_active_without_company()
+                get_overall_inactive = overall_inactive_without_company()
                 get_overall_pullout = overall_pullout_without_db()
                 get_overall_complaint = overall_complaint_without_db()
                 get_overall_dbpoint = overall_dbpoint_without_db()
-            #filters using the route as territory
+            # #filters using the route as territory
             if route:    
                 route_lead = new_calls_route_with_route(route)
                 route_customer = outlet_route_with_route(route)
                 route_customer_co = route_conversion_with_route(route)
+                get_route_active = route_active_with_route(route)
+                get_route_inactive = route_inactive_with_route(route)
                 get_route_pullout = route_pullout_with_route(route)
                 get_route_complaint = route_complaint_with_route(route)
                 get_route_dbpoint = route_dbpoint_with_route(route)
@@ -43,14 +49,12 @@ def dashboard_activites(user_id,db,route):
                 route_lead = new_calls_route_without_route()   
                 route_customer = outlet_route_without_route()  
                 route_customer_co = route_conversion_without_route()
+                get_route_active = route_active_without_route()
+                get_route_inactive = route_inactive_without_route()
                 get_route_pullout = route_pullout_without_route()
                 get_route_complaint = route_complaint_without_route()
                 get_route_dbpoint = route_dbpoint_without_route()
-            #the below method only using for user_id           
-            get_overall_active = overall_active(user_id)
-            get_overall_inactive = overall_inactive(user_id)
-            get_route_active = route_active(route)
-            get_route_inactive = route_inactive(route)
+            # #the below method only using for user_id           
             # Employee Log Type Based on Checkin
             emp_log_type = get_log_type(user_id)
         dashboard = {
@@ -102,8 +106,8 @@ def dashboard_activites(user_id,db,route):
                 {
                     "description": "Inactive",
                     "key":7,
-                    "overall":get_overall_inactive,
-                    "route":get_route_inactive
+                    "overall":get_overall_inactive or 0,
+                    "route":get_route_inactive or 0
                 },
                 {
                     "description": "Pullout",
@@ -649,46 +653,85 @@ def route_conversion_without_route():
     return route_conversion_count 
 
 # get the overall active count created to pass the current date and get the current month data
-def overall_active(user_id):
+def overall_active_with_company(db):
     active_count = 0
-    get_company = frappe.db.get_value("Employee",{'status':"Active",'user_id':user_id},['company'])
-    if get_company:
-        invoice_amount = get_overall_sales_invoice(get_company)
+    invoice_amount = get_overall_sales_invoice_with_company(db)
+    if float(invoice_amount[0]['total']) > 2000.0:
+        active_count += 1
+    else:
+        active_count = 0
+    return active_count
+
+def overall_active_without_company():
+    active_count = 0
+    try:
+        invoice_amount = get_overall_sales_invoice_without_company()
         if float(invoice_amount[0]['total']) > 2000.0:
             active_count += 1
         else:
             active_count = 0
-    else:
-        active_count = 0    
-    return active_count
+        return active_count
+    except:
+        active_count = 0
+        return active_count
 
-def overall_inactive(user_id):
+def overall_inactive_with_company(db):
     inactive_count = 0
-    get_company = frappe.db.get_value("Employee",{'status':"Active",'user_id':user_id},['company'])
-    if get_company:
-        invoice_amount = get_overall_sales_invoice(get_company)
+    invoice_amount = get_overall_sales_invoice_with_company(db)
+    if float(invoice_amount[0]['total']) < 2000.0:
+        active_count += 1
+    else:
+        inactive_count = 0
+    return inactive_count
+
+def overall_inactive_without_company():
+    inactive_count = 0
+    try:
+        invoice_amount = get_overall_sales_invoice_without_company()
         if float(invoice_amount[0]['total']) < 2000.0:
             active_count += 1
         else:
             inactive_count = 0
-    else:
-        inactive_count = 0        
-    return inactive_count
+        return inactive_count
+    except :
+        inactive_count = 0
+        return inactive_count
 
-def get_overall_sales_invoice(company):
+def get_overall_sales_invoice_with_company(db):
     current_date = getdate(today())
+    overall_sales_invoice = 0
     start_date = frappe.utils.data.get_first_day(current_date)
     end_date = frappe.utils.data.get_last_day(current_date)
-
-    overall_sales_invoice = frappe.db.sql("""
+    query_result = frappe.db.sql("""
         SELECT COALESCE(SUM(rounded_total), 0) AS total
         FROM `tabSales Invoice`
         WHERE posting_date BETWEEN %s AND %s AND company = %s
-    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), company), as_dict=True)
+    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'), db), as_dict=True) 
+    if not query_result:
+        overall_sales_invoice = 0
+    else:
+        overall_sales_invoice = query_result[0].get('total', 0) 
     return overall_sales_invoice
 
+def get_overall_sales_invoice_without_company():
+    current_date = getdate(today())
+    overall_sales_invoice = 0
+    start_date = frappe.utils.data.get_first_day(current_date)
+    end_date = frappe.utils.data.get_last_day(current_date)
+    query_result = frappe.db.sql("""
+        SELECT COALESCE(SUM(rounded_total), 0) AS total
+        FROM `tabSales Invoice`
+        WHERE posting_date BETWEEN %s AND %s
+    """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=True) 
+    if not query_result:
+        overall_sales_invoice = 0
+    else:
+        overall_sales_invoice = query_result[0].get('total', 0) 
+    return overall_sales_invoice
+
+
 # get the overall active count created to pass the current date and get the current month data
-def route_active(route):
+def route_active_with_route(route):
     active_count = 0
     get_customers = frappe.db.get_all('Customer', {'territory': route}, ['name'])
     if get_customers:
@@ -700,9 +743,23 @@ def route_active(route):
                 active_count = 0
     else:
         active_count = 0
-    return active_count  
+    return active_count 
 
-def route_inactive(route):
+def route_active_without_route():
+    active_count = 0
+    get_customers = frappe.db.get_all('Customer', ['name'])
+    if get_customers:
+        for customer in get_customers:
+            invoice_amount = get_sales_invoice_amount(customer.name)
+            if float(invoice_amount[0]['total']) > 2000.0:
+                active_count += 1
+            else:
+                active_count = 0
+    else:
+        active_count = 0
+    return active_count   
+
+def route_inactive_with_route(route):
     inactive_count = 0
     get_customers = frappe.db.get_all('Customer', {'territory': route}, ['name'])
     if get_customers:
@@ -714,7 +771,21 @@ def route_inactive(route):
                 inactive_count = 0
     else:
         inactive_count = 0
-    return inactive_count                
+    return inactive_count            
+
+def route_inactive_without_route():
+    inactive_count = 0
+    get_customers = frappe.db.get_all('Customer',['name'])
+    if get_customers:
+        for customer in get_customers:
+            invoice_amount = get_sales_invoice_amount(customer.name)
+            if float(invoice_amount[0]['total']) < 2000.0:
+                inactive_count += 1
+            else:
+                inactive_count = 0
+    else:
+        inactive_count = 0
+    return inactive_count             
 
 def get_sales_invoice_amount(customer):
     current_date = getdate(today())
