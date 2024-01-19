@@ -35,7 +35,7 @@ def dashboard_activites(user_id,db,route):
                 get_overall_pullout = overall_pullout_without_db()
                 get_overall_complaint = overall_complaint_without_db()
                 get_overall_dbpoint = overall_dbpoint_without_db()
-            # #filters using the route as territory
+            # # #filters using the route as territory
             if route:    
                 route_lead = new_calls_route_with_route(route)
                 route_customer = outlet_route_with_route(route)
@@ -655,12 +655,16 @@ def route_conversion_without_route():
 # get the overall active count created to pass the current date and get the current month data
 def overall_active_with_company(db):
     active_count = 0
-    invoice_amount = get_overall_sales_invoice_with_company(db)
-    if float(invoice_amount[0]['total']) > 2000.0:
-        active_count += 1
-    else:
+    try:
+        invoice_amount = get_overall_sales_invoice_with_company(db)
+        if float(invoice_amount[0]['total']) > 2000.0:
+            active_count += 1
+        else:
+            active_count = 0
+        return active_count
+    except:
         active_count = 0
-    return active_count
+        return active_count
 
 def overall_active_without_company():
     active_count = 0
@@ -677,12 +681,16 @@ def overall_active_without_company():
 
 def overall_inactive_with_company(db):
     inactive_count = 0
-    invoice_amount = get_overall_sales_invoice_with_company(db)
-    if float(invoice_amount[0]['total']) < 2000.0:
-        active_count += 1
-    else:
+    try:
+        invoice_amount = get_overall_sales_invoice_with_company(db)
+        if float(invoice_amount[0]['total']) < 2000.0:
+            active_count += 1
+        else:
+            inactive_count = 0
+        return inactive_count
+    except:
         inactive_count = 0
-    return inactive_count
+        return inactive_count
 
 def overall_inactive_without_company():
     inactive_count = 0
