@@ -25,7 +25,8 @@ def get_columns(filters):
 		_("SGST") + ":Currency:100",
 		_("CGST") + ":Currency:100",
 		_("IGST") + ":Currency:100",
-		_("Total Amount") +":Currency:150"
+		_("Total Amount") +":Currency:150",
+		_("Status") + ":Data:100"
 	]
 	return columns
 
@@ -43,7 +44,7 @@ def get_data(filters):
 			sgst_tax_amount = get_sgst_tax_amount(purchase.name)
 			cgst_tax_amount = get_cgst_tax_amount(purchase.name)
 			igst_tax_amount = get_igst_tax_amount(purchase.name)
-			row = [purchase.supplier_name,purchase.tax_id,format_date(purchase.posting_date),purchase.name,purchase.base_net_total,sgst_tax_amount,cgst_tax_amount,igst_tax_amount,purchase.rounded_total]
+			row = [purchase.supplier_name,purchase.tax_id,format_date(purchase.posting_date),purchase.name,purchase.base_net_total,sgst_tax_amount,cgst_tax_amount,igst_tax_amount,purchase.rounded_total,purchase.status]
 			data.append(row)
 	return data	
 
