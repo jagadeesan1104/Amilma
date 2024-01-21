@@ -592,7 +592,7 @@ def overall_conversion_with_db(db):
     query_result = frappe.db.sql("""
         SELECT COUNT(name) AS total_outlet_co
         FROM `tabCustomer`
-        WHERE date(creation) BETWEEN %s AND %s AND customer_name = %s AND name like 'CO'
+        WHERE date(creation) BETWEEN %s AND %s AND customer_name = %s AND custom_outlet_type = "CO-Conversion"
     """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),db), as_dict=1)
     if not query_result:
         overall_conversion_count = 0
@@ -609,7 +609,7 @@ def overall_conversion_without_db():
     query_result = frappe.db.sql("""
         SELECT COUNT(name) AS total_outlet_co
         FROM `tabCustomer`
-        WHERE date(creation) BETWEEN %s AND %s  AND name like 'CO'
+        WHERE date(creation) BETWEEN %s AND %s AND custom_outlet_type = "CO-Conversion"
     """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)
     if not query_result:
         overall_conversion_count = 0
@@ -627,7 +627,7 @@ def route_conversion_with_route(route):
     query_result = frappe.db.sql("""
         SELECT COUNT(name) AS total_outlet_co
         FROM `tabCustomer`
-        WHERE date(creation) BETWEEN %s AND %s AND name like 'CO' AND  territory = %s
+        WHERE date(creation) BETWEEN %s AND %s AND custom_outlet_type = "CO-Conversion" AND  territory = %s
     """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),route), as_dict=1)
     if not query_result:
         route_conversion_count = 0
@@ -644,7 +644,7 @@ def route_conversion_without_route():
     query_result = frappe.db.sql("""
         SELECT COUNT(name) AS total_outlet_co
         FROM `tabCustomer`
-        WHERE date(creation) BETWEEN %s AND %s AND name like 'CO' 
+        WHERE date(creation) BETWEEN %s AND %s AND custom_outlet_type = "CO-Conversion"
     """, (start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d')), as_dict=1)
     if not query_result:
         route_conversion_count = 0
